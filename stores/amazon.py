@@ -108,6 +108,8 @@ class Amazon:
         log_stock_check=False,
         shipping_bypass=False,
         alt_offers=False,
+        config_path=None,
+        profile_path=None
     ):
         self.notification_handler = notification_handler
         self.asin_list = []
@@ -137,6 +139,8 @@ class Amazon:
         self.shipping_bypass = shipping_bypass
         self.unknown_title_notification_sent = False
         self.alt_offers = alt_offers
+        self.config_path = config_path
+        self.profile_path = profile_path
 
         presence.enabled = not disable_presence
 
@@ -144,7 +148,7 @@ class Amazon:
         from cli.cli import global_config
 
         amazon_config = global_config.get_amazon_config(encryption_pass)
-        self.profile_path = global_config.get_browser_profile_path()
+        self.profile_path = global_config.get_browser_profile_path(self.profile_path)
 
         try:
             presence.start_presence()
@@ -165,8 +169,10 @@ class Amazon:
             except:
                 raise
 
-        if os.path.exists(AUTOBUY_CONFIG_PATH):
-            with open(AUTOBUY_CONFIG_PATH) as json_file:
+
+        active_config = self.config_path or AUTOBUY_CONFIG_PATH
+        if os.path.exists(active_config):
+            with open(active_config) as json_file:
                 try:
                     config = json.load(json_file)
                     self.asin_groups = int(config["asin_groups"])

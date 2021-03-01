@@ -196,6 +196,18 @@ def main():
     default=False,
     help="Directly hit the offers page.  Preferred, but deprecated by Amazon.",
 )
+@click.option(
+    "--config-path",
+    type=str,
+    default=None,
+    help="point to custom config",
+)
+@click.option(
+    "--profile-path",
+    type=str,
+    default=None,
+    help="Use custom profile path",
+)
 @notify_on_crash
 def amazon(
     no_image,
@@ -216,17 +228,19 @@ def amazon(
     clean_profile,
     clean_credentials,
     alt_offers,
+    config_path,
+    profile_path,
 ):
     notification_handler.sound_enabled = not disable_sound
     if not notification_handler.sound_enabled:
         log.info("Local sounds have been disabled.")
 
-    if clean_profile and os.path.exists(global_config.get_browser_profile_path()):
+    if clean_profile and os.path.exists(global_config.get_browser_profile_path(profile_path)):
         log.info(
-            f"Removing existing profile at '{global_config.get_browser_profile_path()}'"
+            f"Removing existing profile at '{global_config.get_browser_profile_path(profile_path)}'"
         )
-        profile_size = get_folder_size(global_config.get_browser_profile_path())
-        shutil.rmtree(global_config.get_browser_profile_path())
+        profile_size = get_folder_size(global_config.get_browser_profile_path(profile_path))
+        shutil.rmtree(global_config.get_browser_profile_path(profile_path))
         log.info(f"Freed {profile_size}")
 
     if clean_credentials and os.path.exists(AMAZON_CREDENTIAL_FILE):
@@ -248,6 +262,8 @@ def amazon(
         log_stock_check=log_stock_check,
         shipping_bypass=shipping_bypass,
         alt_offers=alt_offers,
+        config_path=config_path,
+        profile_path=profile_path,
     )
     try:
         amzn_obj.run(delay=delay, test=test)

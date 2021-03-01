@@ -69,10 +69,10 @@ class GlobalConfig:
         )
         return amazon_config
 
-    def get_browser_profile_path(self):
-        if not self.profile_path:
+    def get_browser_profile_path(self, custom_path=None):
+        if not self.profile_path or custom_path:
             self.profile_path = os.path.join(
                 os.path.dirname(os.path.abspath("__file__")),
-                self.global_config["FAIRGAME"].get("profile_name", ".profile-amz"),
+                custom_path or self.global_config["FAIRGAME"].get("profile_name", ".profile-amz"),
             )
         return self.profile_path
